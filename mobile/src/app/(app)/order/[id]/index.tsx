@@ -28,6 +28,8 @@ export default function OrderScreen() {
   const [removingId, setRemovingId] = useState<string | null>(null);
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [discarding, setDiscarding] = useState(false);
+  const [closeConfirmOpen, setCloseConfirmOpen] = useState(false);
+  const [closingBill, setClosingBill] = useState(false);
 
   // Categorias: carrega uma vez e já seleciona a primeira
   useEffect(() => {
@@ -116,6 +118,24 @@ export default function OrderScreen() {
       discardOrder();
     } else {
       setConfirmOpen(true);
+    }
+  }
+
+  /**
+   * "Fechar Conta": envia a mesa direto para a cozinha (mesma rota do "Avançar" →
+   * "Confirmar pedido" na tela de resumo), só pulando essa etapa intermediária.
+   * A mesa fica bloqueada para novos itens e passa a aparecer no Caixa — o
+   * fechamento de verdade (pagamento) só é liberado lá, depois que a cozinha concluir.
+   */
+  async function closeBill() {
+    setClosingBill(true);
+    try {
+      await api.put("/order/send", { order_id: id });
+      setCloseConfirmOpen(false);
+      router.dismissTo({ pathname: "/", params: { sent: table } });
+    } catch (error) {
+      showError(getErrorMessage(error));
+      setClosingBill(false);
     }
   }
 
@@ -243,13 +263,22 @@ export default function OrderScreen() {
           <Text style={styles.footerLabel}>Subtotal</Text>
           <Text style={styles.footerTotal}>{formatPrice(subtotal)}</Text>
         </View>
-        <Button
-          title="Avançar"
-          onPress={() => router.push({ pathname: "/order/[id]/finish", params: { id, table, name: name ?? "" } })}
-          disabled={items.length === 0}
-          icon={<Ionicons name="arrow-forward" size={20} color={colors.foreground} />}
-          style={styles.flex}
-        />
+        <View style={styles.footerActions}>
+          <Button
+            title="Fechar conta"
+            variant="ghost"
+            onPress={() => setCloseConfirmOpen(true)}
+            disabled={items.length === 0}
+            icon={<Ionicons name="cash-outline" size={20} color={colors.foreground} />}
+          />
+          <Button
+            title="Avançar"
+            onPress={() => router.push({ pathname: "/order/[id]/finish", params: { id, table, name: name ?? "" } })}
+            disabled={items.length === 0}
+            icon={<Ionicons name="arrow-forward" size={20} color={colors.foreground} />}
+            style={styles.flex}
+          />
+        </View>
       </View>
 
       <ConfirmModal
@@ -260,6 +289,16 @@ export default function OrderScreen() {
         loading={discarding}
         onConfirm={discardOrder}
         onCancel={() => setConfirmOpen(false)}
+      />
+
+      <ConfirmModal
+        visible={closeConfirmOpen}
+        title={`Fechar conta da mesa ${table}?`}
+        message="O pedido será enviado para a cozinha e a mesa ficará aguardando pagamento no caixa."
+        confirmLabel="Fechar conta"
+        loading={closingBill}
+        onConfirm={closeBill}
+        onCancel={() => setCloseConfirmOpen(false)}
       />
     </View>
   );
@@ -319,4 +358,5 @@ const styles = StyleSheet.create({
   },
   footerLabel: { color: colors.muted, fontSize: 13 },
   footerTotal: { color: colors.foreground, fontSize: 20, fontWeight: "800" },
+  footerActions: { flex: 1, flexDirection: "row", gap: 10 },
 });

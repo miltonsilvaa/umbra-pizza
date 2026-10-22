@@ -15,8 +15,23 @@ export async function findOrderOrFail(order_id: string) {
 export async function findDraftOrderOrFail(order_id: string) {
   const order = await findOrderOrFail(order_id);
 
-  if (!order.draft) {
+  if (order.status !== "DRAFT") {
     throw new AppError("Pedido já foi enviado para a cozinha e não pode ser alterado");
+  }
+
+  return order;
+}
+
+/** Garante que a cozinha já concluiu o pedido antes de fechar a conta. */
+export async function findReadyOrderOrFail(order_id: string) {
+  const order = await findOrderOrFail(order_id);
+
+  if (order.status === "CLOSED") {
+    throw new AppError("Conta já foi fechada");
+  }
+
+  if (order.status !== "READY") {
+    throw new AppError("Pedido ainda não foi concluído pela cozinha");
   }
 
   return order;

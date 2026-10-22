@@ -23,18 +23,26 @@ export interface Product {
   category_id: string;
 }
 
+export type OrderStatus = "DRAFT" | "SENT" | "READY" | "CLOSED";
+
 export interface Order {
   id: string;
   table: number;
-  status: boolean;
-  draft: boolean;
+  status: OrderStatus;
   name: string | null;
+  closed_at: string | null;
   created_at: string;
   updated_at: string;
 }
 
 export interface OrderListItem extends Order {
   _count: { items: number };
+}
+
+export interface ActiveOrder extends Order {
+  itemsCount: number;
+  /** Decimal do Prisma chega como string no JSON */
+  total: string;
 }
 
 export interface OrderItem {

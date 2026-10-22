@@ -4,11 +4,12 @@ import { verify } from "jsonwebtoken";
 import { corsOrigins, env } from "../config/env";
 
 /**
- * Eventos emitidos para o painel da cozinha:
- * - "order:sent"     → um pedido saiu do rascunho e entrou na fila
- * - "order:finished" → um pedido foi concluído e deve sair da fila
+ * Eventos emitidos para os painéis (cozinha e caixa):
+ * - "order:sent"     → um pedido saiu do rascunho e entrou na fila da cozinha
+ * - "order:finished" → a cozinha concluiu e o pedido aguarda pagamento
+ * - "order:closed"   → a conta foi fechada/paga e a mesa deve sair do caixa
  */
-export type OrderEvent = "order:sent" | "order:finished";
+export type OrderEvent = "order:sent" | "order:finished" | "order:closed";
 
 let io: Server | null = null;
 

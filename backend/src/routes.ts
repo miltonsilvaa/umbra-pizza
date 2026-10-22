@@ -63,7 +63,9 @@ router.delete("/order/remove", isAuthenticated, validate(itemIdSchema, "query"),
 
 router.put("/order/send", isAuthenticated, validate(orderIdSchema), order.send);
 router.get("/orders", isAuthenticated, order.list);
+router.get("/order/active", isAuthenticated, order.listActive);
 router.get("/order/detail", isAuthenticated, validate(orderIdSchema, "query"), order.detail);
 router.put("/order/finish", isAuthenticated, validate(orderIdSchema), order.finish);
+router.patch("/order/close", isAuthenticated, validate(orderIdSchema), order.close);
 
 export { router };

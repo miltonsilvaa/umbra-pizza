@@ -9,6 +9,7 @@ import type { Order } from "@/types";
 interface Handlers {
   onSent: (order: Order) => void;
   onFinished: (payload: { id: string }) => void;
+  onClosed?: (payload: { id: string }) => void;
 }
 
 /** Escuta a fila da cozinha em tempo real. Retorna se a conexão está ativa. */
@@ -29,6 +30,7 @@ export function useOrdersSocket(handlers: Handlers) {
     socket.on("connect_error", () => setConnected(false));
     socket.on("order:sent", (order: Order) => handlersRef.current.onSent(order));
     socket.on("order:finished", (payload: { id: string }) => handlersRef.current.onFinished(payload));
+    socket.on("order:closed", (payload: { id: string }) => handlersRef.current.onClosed?.(payload));
 
     return () => {
       socket.disconnect();

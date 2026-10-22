@@ -7,6 +7,8 @@ import { SendOrderService } from "../services/order/SendOrderService";
 import { ListOrdersService } from "../services/order/ListOrdersService";
 import { DetailOrderService } from "../services/order/DetailOrderService";
 import { FinishOrderService } from "../services/order/FinishOrderService";
+import { CloseOrderService } from "../services/order/CloseOrderService";
+import { ListActiveOrdersService } from "../services/order/ListActiveOrdersService";
 
 export class OrderController {
   async create(_req: Request, res: Response) {
@@ -47,5 +49,15 @@ export class OrderController {
   async finish(_req: Request, res: Response) {
     const order = await new FinishOrderService().execute(res.locals.data.order_id);
     return res.json(order);
+  }
+
+  async close(_req: Request, res: Response) {
+    const order = await new CloseOrderService().execute(res.locals.data.order_id);
+    return res.json(order);
+  }
+
+  async listActive(_req: Request, res: Response) {
+    const orders = await new ListActiveOrdersService().execute();
+    return res.json(orders);
   }
 }

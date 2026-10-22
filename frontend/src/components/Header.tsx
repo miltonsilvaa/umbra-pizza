@@ -2,12 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ClipboardList, LogOut, Pizza, Tags } from "lucide-react";
+import { ClipboardList, LogOut, Pizza, Tags, Wallet } from "lucide-react";
 import { useAuth } from "@/contexts/AuthContext";
 import { Logo } from "@/components/ui/Logo";
 
 const links = [
   { href: "/dashboard", label: "Pedidos", icon: ClipboardList },
+  { href: "/dashboard/caixa", label: "Caixa", icon: Wallet },
   { href: "/dashboard/category", label: "Categorias", icon: Tags },
   { href: "/dashboard/product", label: "Produtos", icon: Pizza },
 ];

@@ -15,7 +15,7 @@ export class SendOrderService {
 
     const order = await prisma.order.update({
       where: { id: order_id },
-      data: { draft: false },
+      data: { status: "SENT" },
     });
 
     emitOrderEvent("order:sent", order);

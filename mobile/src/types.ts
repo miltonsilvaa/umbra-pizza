@@ -23,12 +23,14 @@ export interface Product {
   category_id: string;
 }
 
+export type OrderStatus = "DRAFT" | "SENT" | "READY" | "CLOSED";
+
 export interface Order {
   id: string;
   table: number;
-  status: boolean;
-  draft: boolean;
+  status: OrderStatus;
   name: string | null;
+  closed_at: string | null;
 }
 
 export interface OrderItem {
