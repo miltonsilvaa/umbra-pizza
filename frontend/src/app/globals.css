@@ -1,0 +1,45 @@
+@import "tailwindcss";
+
+/* Paleta do projeto — use as classes geradas: bg-background, bg-surface, text-brand, etc. */
+@theme {
+  --color-background: #09090b;
+  --color-surface: #1d1d2e;
+  --color-surface-hover: #26263a;
+  --color-line: #2c2c42;
+  --color-brand: #7c3aed;
+  --color-brand-hover: #6d28d9;
+  --color-success: #3fffa3;
+  --color-warning: #fba92c;
+  --color-foreground: #fafafa;
+  --color-muted: #a1a1aa;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-pop-in: pop-in 0.25s ease-out;
+
+  @keyframes pop-in {
+    from {
+      opacity: 0;
+      transform: translateY(8px) scale(0.98);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+  }
+}
+
+html {
+  color-scheme: dark;
+}
+
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+}
+
+/* Fundo do <dialog> nativo usado nos modais */
+dialog::backdrop {
+  background: rgb(0 0 0 / 0.7);
+  backdrop-filter: blur(2px);
+}
