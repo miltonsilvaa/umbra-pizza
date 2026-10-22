@@ -47,20 +47,25 @@ model Product {
   @@map("products")
 }
 
+enum OrderStatus {
+  DRAFT // mesa aberta, garçom ainda montando o pedido
+  SENT // enviado para a cozinha (fila)
+  READY // cozinha concluiu, aguardando pagamento
+  CLOSED // conta fechada/paga
+}
+
 model Order {
-  id         String   @id @default(uuid())
+  id         String      @id @default(uuid())
   table      Int
-  // false = em preparo (na cozinha) | true = concluído
-  status     Boolean  @default(false)
-  // true = rascunho (garçom ainda montando) | false = enviado para a cozinha
-  draft      Boolean  @default(true)
+  status     OrderStatus @default(DRAFT)
   name       String?
-  created_at DateTime @default(now())
-  updated_at DateTime @updatedAt
+  closed_at  DateTime?
+  created_at DateTime    @default(now())
+  updated_at DateTime    @updatedAt
 
   items Item[]
 
-  @@index([draft, status])
+  @@index([status])
   @@map("orders")
 }
 
