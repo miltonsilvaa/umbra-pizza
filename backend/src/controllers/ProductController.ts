@@ -11,7 +11,8 @@ export class ProductController {
 
     const product = await new CreateProductService().execute({
       ...res.locals.data,
-      banner: req.file.filename,
+      // req.file.path é a URL completa (secure_url) devolvida pelo Cloudinary
+      banner: req.file.path,
     });
 
     return res.status(201).json(product);

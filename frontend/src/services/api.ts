@@ -40,7 +40,12 @@ export function getErrorMessage(error: unknown, fallback = "Algo deu errado. Ten
   return fallback;
 }
 
-/** URL pública da imagem de um produto. */
+/**
+ * URL pública da imagem de um produto. Produtos novos guardam a URL completa
+ * do Cloudinary; produtos antigos (anteriores à migração) guardam só o nome
+ * do arquivo, servido pela API em /files.
+ */
 export function bannerUrl(banner: string) {
+  if (banner.startsWith("http")) return banner;
   return `${API_URL}/files/${banner}`;
 }

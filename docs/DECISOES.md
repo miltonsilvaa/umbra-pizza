@@ -275,10 +275,25 @@ src/app/
 ⚠️ **Impedimento: o Helmet quebraria o carregamento das imagens de produto.** Por padrão (Helmet 8), toda resposta recebe `Cross-Origin-Resource-Policy: same-origin` — e o painel web (`localhost:3000`) carrega as fotos de `GET /files/:banner` de uma origem diferente da API (`localhost:3333`) via `<img>`.
 ✅ **Solução:** `Cross-Origin-Resource-Policy: cross-origin` é liberado manualmente só na rota `/files`, antes do `express.static`. O restante da API mantém a política padrão (mais restritiva), já que suas rotas JSON são consumidas via fetch/axios com CORS, não via tags HTML cross-origin.
 
+## Etapa 5 — Upload de imagens no Cloudinary · 2026-10-22
+
+🧭 **Multer trocou o storage local (`backend/tmp`) pelo `CloudinaryStorage`** (`multer-storage-cloudinary`), motivado pela publicação em produção (Render e serviços PaaS equivalentes têm sistema de arquivos efêmero — qualquer imagem salva em disco é perdida no próximo deploy/restart). `banner` agora guarda a URL completa (`secure_url`) devolvida pelo Cloudinary, em vez do nome do arquivo.
+
+🧭 **Credenciais (`CLOUDINARY_CLOUD_NAME/API_KEY/API_SECRET`) opcionais na validação de ambiente**, mesmo sendo essenciais pro upload funcionar. Motivo: a conta no Cloudinary ainda não existe neste momento; exigi-las como obrigatórias derrubaria a API inteira (login, cozinha, caixa — tudo) só por falta de uma credencial de uma funcionalidade específica. Sem elas, a API sobe normal e só a rota de upload falha com `"Upload de imagem indisponível: credenciais do Cloudinary não configuradas."`.
+
+🧭 **Produtos cadastrados antes dessa migração continuam funcionando.** A rota `GET /files/:banner` (disco local) foi mantida só para servir essas fotos antigas; `bannerUrl()` no frontend decide automaticamente entre a URL do Cloudinary (produtos novos) e a rota antiga (produtos legados), olhando se o valor já começa com `http`.
+
+⚠️ **Impedimento: limpeza de imagem órfã.** O `errorHandler` apagava `req.file.path` do disco quando a requisição terminava em erro depois do upload (ex: validação Zod falhando). Com o Cloudinary, `req.file.path` passou a ser uma URL, não um caminho de arquivo — `fs.unlink` nela falharia silenciosamente, vazando a imagem já enviada.
+✅ **Solução:** troca para `cloudinary.uploader.destroy(req.file.filename)` (o `multer-storage-cloudinary` preenche `filename` com o `public_id` do Cloudinary).
+
+⚠️ **Impedimento: incompatibilidade de tipos entre `multer-storage-cloudinary@4` e a versão instalada de `cloudinary`.** O helper de tipos do primeiro assume que `UploadApiOptions` (do segundo) não tem índice livre; a versão atual do `cloudinary` adicionou `[futureKey: string]: any`, o que colapsa o cálculo de chaves conhecidas do TypeScript e rejeita até campos válidos como `folder`.
+✅ **Solução:** cast pontual e comentado em `config/multer.ts` — é um bug de tipos entre as duas libs, não um erro de uso; o campo é aceito normalmente em runtime pela API do Cloudinary.
+
 ## Próximas etapas
 - [ ] Liberar espaço no disco C: (bloqueando ferramentas de desenvolvimento)
-- [ ] Rodar migrations e testar a API ponta a ponta com o banco real
+- [x] Rodar migrations e testar a API ponta a ponta com o banco real
 - [x] Etapa 2 — Painel Web (Next.js App Router + Tailwind + Socket.IO client)
 - [x] Etapa 3 — App do Garçom (Expo + TypeScript): código pronto, typecheck/lint OK
-- [ ] Etapa 3 — testar no celular com Expo Go: fluxo completo + digitação logo após o login
-- [ ] Produção: token em cookie `httpOnly` emitido pela API; imagens no Cloudinary; API em HTTPS
+- [x] Etapa 3 — testar no celular com Expo Go: fluxo completo + digitação logo após o login
+- [x] Produção: imagens no Cloudinary (código pronto; falta criar a conta e preencher as credenciais)
+- [ ] Produção: token em cookie `httpOnly` emitido pela API; API em HTTPS

@@ -19,6 +19,7 @@ export interface Product {
   /** Decimal do Prisma chega como string no JSON — use Number(price) */
   price: string;
   description: string;
+  /** URL completa (Cloudinary) em produtos novos; nome do arquivo em produtos antigos — use bannerUrl() */
   banner: string;
   category_id: string;
 }

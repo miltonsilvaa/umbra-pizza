@@ -5,6 +5,7 @@ interface Request {
   name: string;
   price: number;
   description: string;
+  /** URL completa da imagem no Cloudinary (produtos antigos guardam só o nome do arquivo local). */
   banner: string;
   category_id: string;
 }

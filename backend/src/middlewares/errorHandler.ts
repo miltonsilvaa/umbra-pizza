@@ -1,14 +1,14 @@
-import fs from "node:fs";
 import type { NextFunction, Request, Response } from "express";
 import { Prisma } from "@prisma/client";
 import { MulterError } from "multer";
 import { ZodError } from "zod";
 import { AppError } from "../errors/AppError";
+import { cloudinary } from "../config/cloudinary";
 
 export function errorHandler(err: Error, req: Request, res: Response, _next: NextFunction) {
-  // Se a requisição falhou depois do upload (ex: validação), descarta a imagem órfã
+  // Se a requisição falhou depois do upload (ex: validação), descarta a imagem órfã no Cloudinary
   if (req.file) {
-    fs.promises.unlink(req.file.path).catch(() => {});
+    cloudinary.uploader.destroy(req.file.filename).catch(() => {});
   }
 
   if (err instanceof AppError) {
