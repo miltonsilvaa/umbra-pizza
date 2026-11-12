@@ -21,16 +21,21 @@ credenciais automaticamente.
 
 1. **Logue com a conta demo** (botão de demonstração ou as credenciais acima).
 2. O painel abre com um banner de aviso de ambiente de demonstração e já traz dados de exemplo:
-   4 categorias, ~10 produtos e duas mesas abertas — uma **em preparo** (mesa 50, na fila da
-   cozinha) e outra **aguardando pagamento** (mesa 51, pronta para o caixa).
-3. **Abra uma mesa nova**: use o app do garçom (`mobile/`) para abrir uma mesa e lançar itens, ou
-   crie um pedido direto pela API (`POST /order`) se só o painel web estiver disponível.
-4. **Lance um item** na mesa aberta.
-5. **Veja chegar na cozinha**: a tela "Pedidos" do painel web recebe o pedido em tempo real
-   (Socket.IO) assim que ele é enviado pelo garçom.
-6. **Conclua na cozinha**: marque o pedido como concluído — ele sai da fila e aparece no "Caixa",
-   junto com a mesa 51 que já veio pronta no seed.
-7. **Feche a mesa** na tela "Caixa" para simular o pagamento.
+   4 categorias, ~10 produtos e três mesas no "Caixa" — uma **aberta** (mesa 52, ainda sendo
+   montada), uma **em preparo** (mesa 50, na fila da cozinha) e outra **aguardando pagamento**
+   (mesa 51, pronta para fechar a conta).
+3. Na tela **"Caixa"**, clique em **"Adicionar itens"** na mesa 52 (é o único botão que aparece
+   em mesas ainda abertas — depois de enviada para a cozinha, o pedido não pode mais ser alterado).
+4. **Lance um item**: escolha categoria, produto e quantidade, e clique em "Adicionar".
+5. Clique em **"Enviar para a cozinha"** — a mesa sai do "Caixa" como rascunho e entra na fila.
+6. **Veja chegar na cozinha**: a tela "Pedidos" recebe o pedido em tempo real (Socket.IO), com
+   bipe e aviso, sem precisar atualizar a página.
+7. **Conclua na cozinha**: abra o pedido e clique em "Concluir pedido" — ele sai da fila e volta
+   a aparecer no "Caixa", agora como "Aguardando pagamento".
+8. **Feche a conta** na tela "Caixa" para simular o pagamento.
+
+> O app do garçom (`mobile/`) tem a mesma tela de lançar itens e também pode abrir mesas novas,
+> mas não é necessário para este roteiro — tudo acima funciona só com o painel web.
 
 ### Repopulando os dados de demonstração
 

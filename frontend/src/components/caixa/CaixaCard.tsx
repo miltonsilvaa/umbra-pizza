@@ -1,4 +1,5 @@
-import { Wallet } from "lucide-react";
+import Link from "next/link";
+import { Plus, Wallet } from "lucide-react";
 import { formatPrice } from "@/lib/format";
 import { Button } from "@/components/ui/Button";
 import type { ActiveOrder, OrderStatus } from "@/types";
@@ -42,15 +43,25 @@ export function CaixaCard({ order, closing, onClose }: CaixaCardProps) {
           <p className="text-xl font-bold">{formatPrice(order.total)}</p>
         </div>
 
-        <Button
-          onClick={() => onClose(order.id)}
-          disabled={!canClose}
-          loading={closing}
-          title={canClose ? undefined : "Aguardando a cozinha concluir o pedido"}
-        >
-          <Wallet size={18} aria-hidden />
-          Fechar conta
-        </Button>
+        {order.status === "DRAFT" ? (
+          <Link
+            href={`/dashboard/order/${order.id}`}
+            className="inline-flex h-12 cursor-pointer items-center justify-center gap-2 rounded-lg bg-brand px-6 font-semibold text-white outline-none transition hover:bg-brand-hover focus-visible:ring-4 focus-visible:ring-brand/40"
+          >
+            <Plus size={18} aria-hidden />
+            Adicionar itens
+          </Link>
+        ) : (
+          <Button
+            onClick={() => onClose(order.id)}
+            disabled={!canClose}
+            loading={closing}
+            title={canClose ? undefined : "Aguardando a cozinha concluir o pedido"}
+          >
+            <Wallet size={18} aria-hidden />
+            Fechar conta
+          </Button>
+        )}
       </div>
     </div>
   );

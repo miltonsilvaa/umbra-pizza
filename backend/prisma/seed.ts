@@ -10,6 +10,7 @@ const DEMO_PASSWORD = "demo123";
 // colidir com mesas que um recrutador abra manualmente durante o teste.
 const DEMO_TABLE_PREPARING = 50;
 const DEMO_TABLE_AWAITING_PAYMENT = 51;
+const DEMO_TABLE_OPEN = 52; // rascunho, para testar "Adicionar itens" + "Enviar para a cozinha"
 
 type CategoryName = "Pizzas Salgadas" | "Pizzas Doces" | "Bebidas" | "Sobremesas";
 
@@ -154,7 +155,7 @@ async function main() {
   // que o painel sempre abre com os dois cenários esperados, mesmo que um
   // recrutador já tenha fechado/alterado essas mesas em um teste anterior.
   await prisma.order.deleteMany({
-    where: { table: { in: [DEMO_TABLE_PREPARING, DEMO_TABLE_AWAITING_PAYMENT] } },
+    where: { table: { in: [DEMO_TABLE_PREPARING, DEMO_TABLE_AWAITING_PAYMENT, DEMO_TABLE_OPEN] } },
   });
 
   const preparingOrder = await prisma.order.create({
@@ -184,8 +185,19 @@ async function main() {
     },
   });
 
+  const openOrder = await prisma.order.create({
+    data: {
+      table: DEMO_TABLE_OPEN,
+      status: "DRAFT", // ainda sendo montada — testa "Adicionar itens" + "Enviar para a cozinha" no painel web
+      items: {
+        create: [{ amount: 1, product_id: productsByName.get("Água Mineral 500ml")!.id }],
+      },
+    },
+  });
+
   console.log(
-    `✅ Mesa ${preparingOrder.table} (em preparo) e mesa ${awaitingPaymentOrder.table} (aguardando pagamento) criadas`,
+    `✅ Mesa ${preparingOrder.table} (em preparo), mesa ${awaitingPaymentOrder.table} (aguardando pagamento) ` +
+      `e mesa ${openOrder.table} (aberta, no caixa) criadas`,
   );
 }
 
