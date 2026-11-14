@@ -1,9 +1,38 @@
 # 🍕 UmbraPizza
 
 Ecossistema de pedidos para uma pizzaria: API (Node/Express/Prisma), painel web da cozinha/admin
-(Next.js) e app do garçom (Expo/React Native). Detalhes de arquitetura e decisões técnicas em
-[`docs/DECISOES.md`](docs/DECISOES.md); instruções de setup de cada parte em `backend/README.md`,
-`frontend/README.md` e `mobile/README.md`.
+(Next.js) e app do garçom (Expo/React Native). Instruções de setup de cada parte em
+`backend/README.md`, `frontend/README.md` e `mobile/README.md`.
+
+## Decisões técnicas
+
+O projeto todo foi documentado como um diário de decisões em
+[`docs/DECISOES.md`](docs/DECISOES.md) — não só *o que* foi construído, mas *por que*, incluindo
+impedimentos reais e como foram resolvidos. Alguns destaques:
+
+- **Express 5 (não 4):** erros em handlers `async` propagam direto para o middleware de erro, sem
+  precisar de `try/catch` em todo controller nem do pacote `express-async-errors`.
+- **Preço como `Decimal`, não `String`:** permite somar no banco com precisão exata
+  (`0.1 + 0.2 ≠ 0.3` em ponto flutuante) e documentado o cuidado que isso exige no front (Prisma
+  serializa `Decimal` como string no JSON).
+- **Validação com Zod em toda rota**, convertendo e validando a entrada antes de chegar no
+  controller, com erro por campo em vez de mensagens genéricas.
+- **Tempo real com Socket.IO** (pedido novo e pedido concluído), com autenticação por JWT no
+  handshake — faltava no desenho original e foi corrigido depois de identificado como falha de
+  segurança (qualquer um que soubesse o endereço da API conseguia ouvir todos os pedidos).
+- **Autenticação em duas camadas no painel web:** checagem otimista por cookie no proxy
+  (`proxy.ts`) pra UX rápida, e checagem real contra a API (`GET /me`) pra segurança de verdade.
+- **Helmet + CORS ajustado rota a rota:** headers de segurança padrão em toda a API, com uma
+  exceção pontual e justificada em `/files` para as imagens de produto continuarem carregando
+  cross-origin no painel.
+- **Migração do upload de imagens para Cloudinary:** motivada por produção — PaaS como Render tem
+  sistema de arquivos efêmero, então salvar em disco local perderia as imagens a cada deploy.
+- **Dívidas técnicas documentadas, não escondidas:** por exemplo, o cookie de sessão do painel
+  ainda não é `httpOnly` — está anotado como pendência conhecida para produção, com o porquê de
+  não ser bloqueante agora.
+
+Cada etapa do `docs/DECISOES.md` segue o mesmo formato: 🧭 decisão tomada, ⚠️ impedimento
+encontrado, ✅ como foi resolvido.
 
 ## Testando o projeto (ambiente de demonstração)
 
