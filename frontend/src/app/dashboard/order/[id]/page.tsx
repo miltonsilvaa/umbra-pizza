@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { ArrowLeft, ChevronDown, Minus, Plus, Send, Trash2 } from "lucide-react";
@@ -12,6 +12,14 @@ import type { Category, OrderDetail, Product } from "@/types";
 
 /** Tela web equivalente ao "lançar itens" do app do garçom — só funciona em mesas DRAFT (ainda não enviadas à cozinha). */
 export default function LaunchOrderPage() {
+  return (
+    <Suspense fallback={<div className="h-64 animate-pulse rounded-2xl bg-surface" />}>
+      <LaunchOrderPageContent />
+    </Suspense>
+  );
+}
+
+function LaunchOrderPageContent() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
 
